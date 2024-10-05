@@ -1,0 +1,122 @@
+,<style>
+     /* Add additional styling for dynamic content */
+ #search-section {
+    text-align: center;
+    margin: 20px 0;
+}
+
+#searchInput {
+    padding: 10px;
+    width: 50%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.play-count {
+    margin-top: 5px;
+    color: #555;
+    font-size: 14px;
+}
+
+</style>
+
+<!-- Search Bar -->
+<div id="search-section">
+    <input type="text" id="searchInput" placeholder="Search sermons..." onkeyup="filterSermons()">
+</div>
+
+<section id="audio&video-section" class="audio">
+    <div class="audio-cards">
+    <h2>Audio Sermons (Month {September})</h2>
+    <div id="audio-list"></div>
+    <div id="video-list"></div>
+    </div>
+</section>
+
+<script>
+    // JavaScript for dynamic features
+
+    // Sample sermon data for dynamic loading
+    const sermons = {
+        audio: [
+            { title: "Audio Sermon 1", file: "sermons/WORD BY PASTOR GUOYO......14'APRIL'24.mp3", plays: 0 },
+            { title: "Audio Sermon 2", file: "sermons/audio-sermon2.mp3", plays: 0 }
+        ],
+        video: [
+            { title: "Video Sermon 1", file: "sermons/video-sermon1.mp4", plays: 0 },
+            { title: "Video Sermon 2", file: "sermons/video-sermon2.mp4", plays: 0 }
+        ]
+    };
+
+    // Function to generate HTML for sermons dynamically
+    function loadSermons() {
+        const audioList = document.getElementById("audio-list");
+        const videoList = document.getElementById("video-list");
+
+        // Load audio sermons
+        sermons.audio.forEach((sermon, index) => {
+            const audioDiv = document.createElement("div");
+            audioDiv.className = "media";
+            audioDiv.innerHTML = `
+                <audio controls onplay="trackPlay('audio', ${index})">
+                    <source src="${sermon.file}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+                <a href="${sermon.file}" download>Download ${sermon.title}</a>
+                <p class="play-count">Played: <span id="audio-plays-${index}">${sermon.plays}</span> times</p>
+            `;
+            audioList.appendChild(audioDiv);
+        });
+
+        // Load video sermons
+        sermons.video.forEach((sermon, index) => {
+            const videoDiv = document.createElement("div");
+            videoDiv.className = "media";
+            videoDiv.innerHTML = `
+                <video controls onplay="trackPlay('video', ${index})">
+                    <source src="${sermon.file}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <a href="${sermon.file}" download>Download ${sermon.title}</a>
+                <p class="play-count">Played: <span id="video-plays-${index}">${sermon.plays}</span> times</p>
+            `;
+            videoList.appendChild(videoDiv);
+        });
+    }
+
+    // Function to track play count
+    function trackPlay(type, index) {
+        sermons[type][index].plays += 1;
+        document.getElementById(`${type}-plays-${index}`).innerText = sermons[type][index].plays;
+    }
+
+    // Function to filter sermons based on search input
+    function filterSermons() {
+        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+        const audioDivs = document.querySelectorAll("#audio-list .media");
+        const videoDivs = document.querySelectorAll("#video-list .media");
+
+        audioDivs.forEach((div, index) => {
+            const title = sermons.audio[index].title.toLowerCase();
+            div.style.display = title.includes(searchTerm) ? "" : "none";
+        });
+
+        videoDivs.forEach((div, index) => {
+            const title = sermons.video[index].title.toLowerCase();
+            div.style.display = title.includes(searchTerm) ? "" : "none";
+        });
+    }
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('nav a').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            target.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // Load sermons on page load
+    window.onload = loadSermons;
+</script>
+
